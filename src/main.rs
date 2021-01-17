@@ -4,12 +4,15 @@ async fn greet(req: HttpRequest) -> impl Responder {
     format!("Hello {}!", &name)
 }
 
+async fn health_check(req: HttpRequest) -> impl Responder {
+    HttpResponse::Ok().finish()
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .route("/", web::get().to(greet))
-            .route("/{name}", web::get().to(greet))
+        .route("health_check", web::get().to(health_check))
     })
     .bind("127.0.0.1:8000")?
     .run()
