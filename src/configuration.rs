@@ -1,5 +1,3 @@
-use serde::de::value::StringDeserializer;
-
 #[derive(serde::Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
