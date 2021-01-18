@@ -21,14 +21,17 @@ serde = { version = "1", features = ["derive"]}
 actix-web = "3.0.0"
 actix-rt = "1.1.1"
 
-# Using table-like toml syntax to avoid a super-long line! [dependencies.sqlx]
+# Using table-like toml syntax to avoid a super-long line!
+[dependencies.sqlx]
 version = "0.4.1"
 default-features = false
-features = [ "runtime-actix-rustls", "macros",
-"postgres",
-"uuid",
-"chrono",
-"migrate"
+features = [
+    "runtime-actix-rustls",
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
+    "migrate"
 ]
 
 [dev-dependencies]
