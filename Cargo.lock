@@ -3038,6 +3038,7 @@ dependencies = [
  "tracing",
  "tracing-bunyan-formatter",
  "tracing-futures",
+ "tracing-log",
  "tracing-subscriber",
  "uuid",
 ]
