@@ -15,12 +15,13 @@ pub async fn subscribe(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let request_id = Uuid::new_v4();
-    tracing::info!(
-        "request_id {} - Adding `{}` `{}` as a new subscriber.",
-        request_id,
-        form.email,
-        form.name
+    let request_span = tracing::info_span!(
+        "Adding a new subscriber.",
+        %request_id,
+        email = %form.email,
+        name = %form.name
     );
+    let _request_span_guard = request_span.enter();
     tracing::info!(
         "request_id {} - Saving new subscriber details in the database",
         request_id
