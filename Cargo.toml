@@ -47,3 +47,4 @@ features = [
 [dev-dependencies]
 reqwest = "0.10"
 tokio = "0.2.22"
+lazy_static = "1.4.0"

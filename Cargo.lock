@@ -3030,6 +3030,7 @@ dependencies = [
  "chrono",
  "config",
  "env_logger",
+ "lazy_static",
  "log",
  "reqwest",
  "serde 1.0.119",

@@ -1,9 +1,11 @@
+use actix_web::test::init_service;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use uuid::Uuid;
 use zero2prod::{
     configuration::{get_configuration, DatabaseSettings},
     startup::run,
+    telemetry::{get_subscriber, init_subscriber},
 };
 
 pub struct TestApp {
@@ -29,8 +31,20 @@ async fn health_check_works() {
     assert_eq!(Some(0), response.content_length());
 }
 
+// Ensure that the `tracing` stack is only initiilised once using `lazy_static
+lazy_static::lazy_static! {
+    static ref TRACING: () = {
+        let filter = if std::env::var("TEST_LOG").is_ok() { "debug" } else { "" };
+        let subscriber = get_subscriber("test".into(), filter.into());
+        init_subscriber(subscriber);
+    };
+}
+
 // Launch our application in the background ~somehow~
 async fn spawn_app() -> TestApp {
+    // The first time `initialize` is invoked the code in `TRACING` is executed.
+    // All other invocations will instead skip execution.
+    lazy_static::initialize(&TRACING);
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     // We retrieve the port assigned to use by the OS
     let port = listener.local_addr().unwrap().port();
