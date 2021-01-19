@@ -25,6 +25,7 @@ actix-rt = "1.1.1"
 config = "0.10.1"
 env_logger = "0.8.2"
 log = "0.4.13"
+tracing = "0.1.22"
 
 # Using table-like toml syntax to avoid a super-long line!
 [dependencies.sqlx]
