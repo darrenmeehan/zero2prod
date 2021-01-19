@@ -1,4 +1,3 @@
-use actix_web::test::init_service;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use uuid::Uuid;
