@@ -1,14 +1,23 @@
-FROM rust:1.47
+# Builder stage
+FROM rust:1.47 as builder
 
 WORKDIR app
-
-# Copy all files from our working environment to our Docker image
 COPY . .
-
 ENV SQLX_OFFLINE true
-
 RUN cargo build --release
 
-ENV APP_ENVIRONMENT production
+# Runtime stage
+FROM debian:buster-slim as Runtime
+WORKDIR app
+# Install OpenSSL - it is dynamically linked by some of our dependencies
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends openssl \
+    # Clean up
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT [ "./target/release/zero2prod" ]
+COPY --from=builder /app/target/release/zero2prod zero2prod
+COPY configuration configuration
+ENV APP_ENVIRONMENT production
+ENTRYPOINT [ "./zero2prod" ]
