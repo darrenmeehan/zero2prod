@@ -32,6 +32,7 @@ tracing-bunyan-formatter = "0.1.7"
 tracing-log = "0.1.1"
 tracing-actix-web = "0.2.1"
 serde-aux = "2.1.1"
+unicode-segmentation = "1.7.1"
 
 # Using table-like toml syntax to avoid a super-long line!
 [dependencies.sqlx]
