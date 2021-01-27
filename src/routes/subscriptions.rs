@@ -1,8 +1,8 @@
+use crate::domain::{NewSubscriber, SubscriberName};
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
-use crate::domain::{NewSubscriber, SubscriberName};
 
 #[derive(serde::Deserialize)]
 pub struct FormData {
@@ -24,9 +24,11 @@ pub async fn subscribe(
 ) -> Result<HttpResponse, HttpResponse> {
     // `web::Form` is a wrapper around `FormData`
     // `form.0` gives us access to the underlying `FormData`
+    let name = SubscriberName::parse(form.0.name)
+        .map_err(|_| HttpResponse::BadRequest().finish())?;
     let new_subscriber = NewSubscriber {
         email: form.0.email,
-        name: SubscriberName::parse(form.0.name)
+        name: name,
     };
     insert_subscriber(&pool, &new_subscriber)
         .await
@@ -38,7 +40,10 @@ pub async fn subscribe(
     name = "Saving new subscriber details in the database",
     skip(new_subscriber, pool)
 )]
-pub async fn insert_subscriber(pool: &PgPool, new_subscriber: &NewSubscriber) -> Result<(), sqlx::Error> {
+pub async fn insert_subscriber(
+    pool: &PgPool,
+    new_subscriber: &NewSubscriber,
+) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)

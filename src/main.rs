@@ -1,4 +1,4 @@
-use sqlx::{postgres::PgPoolOptions};
+use sqlx::postgres::PgPoolOptions;
 use std::net::TcpListener;
 use zero2prod::configuration::get_configuration;
 use zero2prod::startup::run;
@@ -16,7 +16,10 @@ async fn main() -> std::io::Result<()> {
         .connect_with(configuration.database.with_db())
         .await
         .expect("Failed to connect to Postgres.");
-    let address = format!("{}:{}", configuration.application.host, configuration.application.port);
+    let address = format!(
+        "{}:{}",
+        configuration.application.host, configuration.application.port
+    );
     let listener = TcpListener::bind(address)?;
     run(listener, connection_pool)?.await
 }

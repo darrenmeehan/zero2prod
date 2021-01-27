@@ -1,6 +1,6 @@
-use std::convert::{TryFrom, TryInto};
 use serde_aux::field_attributes::deserialize_number_from_string;
 use sqlx::postgres::{PgConnectOptions, PgSslMode};
+use std::convert::{TryFrom, TryInto};
 
 #[derive(serde::Deserialize)]
 pub struct Settings {
@@ -40,7 +40,6 @@ impl DatabaseSettings {
     }
 }
 
-
 #[derive(serde::Deserialize)]
 pub struct ApplicationSettings {
     #[serde(deserialize_with = "deserialize_number_from_string")]
@@ -62,7 +61,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
 
     // Layer on the environment-specific value.
     settings.merge(
-        config::File::from(configuration_directory.join(environment.as_str())).required(true)
+        config::File::from(configuration_directory.join(environment.as_str())).required(true),
     )?;
 
     // Add in settings from environment variables (with a prefix of APP and `__` as separator)
@@ -81,7 +80,7 @@ pub enum Environment {
 }
 
 impl Environment {
-    pub fn as_str(&self) ->  &'static str {
+    pub fn as_str(&self) -> &'static str {
         match self {
             Environment::Local => "local",
             Environment::Production => "production",
