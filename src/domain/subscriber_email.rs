@@ -3,7 +3,6 @@ use validator::validate_email;
 #[derive(Debug)]
 pub struct SubscriberEmail(String);
 
-
 impl SubscriberEmail {
     pub fn parse(s: String) -> Result<SubscriberEmail, String> {
         if validate_email(&s) {
@@ -42,5 +41,4 @@ mod tests {
         let email = "@domain.com".to_string();
         assert_err!(SubscriberEmail::parse(email));
     }
-
 }

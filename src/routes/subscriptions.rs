@@ -24,8 +24,8 @@ pub async fn subscribe(
 ) -> Result<HttpResponse, HttpResponse> {
     // `web::Form` is a wrapper around `FormData`
     // `form.0` gives us access to the underlying `FormData`
-    let name = SubscriberName::parse(form.0.name)
-        .map_err(|_| HttpResponse::BadRequest().finish())?;
+    let name =
+        SubscriberName::parse(form.0.name).map_err(|_| HttpResponse::BadRequest().finish())?;
     let new_subscriber = NewSubscriber {
         email: form.0.email,
         name: name,
