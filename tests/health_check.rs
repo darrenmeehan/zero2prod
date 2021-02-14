@@ -30,7 +30,7 @@ async fn health_check_works() {
     assert_eq!(Some(0), response.content_length());
 }
 
-// Ensure that the `tracing` stack is only initiilised once using `lazy_static
+// Ensure that the `tracing` stack is only initialised once using `lazy_static
 lazy_static::lazy_static! {
     static ref TRACING: () = {
         let filter = if std::env::var("TEST_LOG").is_ok() { "debug" } else { "" };
