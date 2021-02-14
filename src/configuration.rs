@@ -9,13 +9,6 @@ pub struct Settings {
 }
 
 #[derive(serde::Deserialize)]
-pub struct ApplicationSettings {
-    #[serde(deserialize_with = "deserialize_number_from_string")]
-    pub port: u16,
-    pub host: String,
-}
-
-#[derive(serde::Deserialize)]
 pub struct DatabaseSettings {
     pub username: String,
     pub password: String,
@@ -31,6 +24,7 @@ impl DatabaseSettings {
         let ssl_mode = if self.require_ssl {
             PgSslMode::Require
         } else {
+            // Try an encrypted connection, fallback to unencrypted or not
             PgSslMode::Prefer
         };
         PgConnectOptions::new()
@@ -46,34 +40,40 @@ impl DatabaseSettings {
     }
 }
 
+#[derive(serde::Deserialize)]
+pub struct ApplicationSettings {
+    #[serde(deserialize_with = "deserialize_number_from_string")]
+    pub port: u16,
+    pub host: String,
+}
+
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let mut settings = config::Config::default();
-    let base_path = std::env::current_dir().expect("Failed to determine the current directory");
+    let base_path = std::env::current_dir().expect("Failed to determine the current directory.");
     let configuration_directory = base_path.join("configuration");
-
-    // Read the "default" configuration file
     settings.merge(config::File::from(configuration_directory.join("base")).required(true))?;
 
-    // Detect the running environment.
     // Default to `local` if unspecified.
     let environment: Environment = std::env::var("APP_ENVIRONMENT")
         .unwrap_or_else(|_| "local".into())
         .try_into()
         .expect("Failed to parse APP_ENVIRONMENT.");
 
-    // Layer on the environment-specific values.
+    // Layer on the environment-specific value.
     settings.merge(
         config::File::from(configuration_directory.join(environment.as_str())).required(true),
     )?;
 
-    // Add in settings from environment variables (with a prefix of APP and '__' as separator)
-    // E.g. `APP_APPLICATION__PORT=5001 would set `Settings.application.port`
+    // Add in settings from environment variables (with a prefix of APP and `__` as separator)
+    // E.g. `APP_APPLICATION__PORT would set `Settings.application.port`
     settings.merge(config::Environment::with_prefix("app").separator("__"))?;
 
+    // Try to convert the configuration values it read into
+    // our Settings type
     settings.try_into()
 }
 
-/// The possible runtime environment for our application.
+// The possible runtime environment for our application.
 pub enum Environment {
     Local,
     Production,
