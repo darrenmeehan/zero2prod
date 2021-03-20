@@ -33,6 +33,30 @@ impl SubscriberName {
             Ok(Self(s))
         }
     }
+
+    pub fn inner(self) -> String {
+        // Not used.
+        // The caller gets the inner string,
+        // but the ydo not have a SubscriberName anymore!
+        // That's because `inner` takes `self` by value,
+        // consuming it according to move semantics
+        self.0
+    }
+
+    pub fn inner_mut(&mut self) -> &mut str {
+        // Not used.
+        // The caller gets a mutable reference to the inner string.
+        // This allows them to perform *arbitrary* changes to
+        // the value itself, potentially breaking our invariants!
+        &mut self.0
+    }
+
+    pub fn inner_ref(&self) -> &str {
+        // The caller gets a shared reference to the inner string.
+        // This gibes the caller **read-only** access,
+        // they have no way to compromise our invariants!
+        &self.0
+    }
 }
 
 impl AsRef<str> for SubscriberName {

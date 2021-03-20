@@ -33,10 +33,10 @@ pub async fn subscribe(
     form: web::Form<FormData>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
-    let new_subscriber = form
-        .0
-        .try_into()
-        .map_err(|_| HttpResponse::BadRequest().finish())?;
+    let new_subscriber = NewSubscriber {
+        email: SubscriberEmail::parse(form.0.email).expect("Email validation failed."),
+        name: SubscriberName::parse(form.0.name).expect("Name validation failed."),
+    };
     insert_subscriber(&pool, &new_subscriber)
         .await
         .map_err(|_| HttpResponse::InternalServerError().finish())?;
@@ -58,7 +58,7 @@ pub async fn insert_subscriber(
             "#,
         Uuid::new_v4(),
         new_subscriber.email.as_ref(),
-        new_subscriber.name.as_ref(),
+        new_subscriber.name.inner_ref(),
         Utc::now()
     )
     .execute(pool)
